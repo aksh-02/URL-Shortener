@@ -26,7 +26,7 @@ type MyURL struct {
 var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 func dbClient(ctx context.Context) (*mongo.Client, error) {
-	uri := ""
+	uri := "mongodb+srv://urluser:urlpswd@cluster0.hl2el.mongodb.net/URLService?retryWrites=true&w=majority"
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		fmt.Printf("Couldn't connect to the cluster : %v\n", err)
