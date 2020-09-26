@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +27,7 @@ type MyURL struct {
 var alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 func dbClient(ctx context.Context) (*mongo.Client, error) {
-	uri := "mongodb+srv://urluser:urlpswd@cluster0.hl2el.mongodb.net/URLService?retryWrites=true&w=majority"
+	uri := os.Getenv("SHORTENED_URI")
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		fmt.Printf("Couldn't connect to the cluster : %v\n", err)
@@ -37,7 +38,7 @@ func dbClient(ctx context.Context) (*mongo.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println("Connected to MongoDB")
 	return client, nil
 }
 
@@ -149,16 +150,20 @@ func main() {
 		}
 	}()
 	collection = client.Database("URLService").Collection("Shortened")
+	fmt.Println("We're online.")
 
 	sm := mux.NewRouter()
 	sm.HandleFunc("/{id:[a-zA-Z0-9]+}", Expander).Methods(http.MethodGet)
 	sm.HandleFunc("/", Shortener).Methods(http.MethodPost)
 
 	s := http.Server{
-		Addr:         "127.0.0.1:8080", // configure the bind address
+		Addr:         ":8080",          // configure the bind address
 		Handler:      sm,               // set the default handler
 		ReadTimeout:  5 * time.Second,  // max time to read request from the client
 		WriteTimeout: 10 * time.Second, // max time to write response to the client
 	}
-	s.ListenAndServe()
+	err = s.ListenAndServe()
+	if err != nil {
+		fmt.Println("Some Error", err)
+	}
 }
