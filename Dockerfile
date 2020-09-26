@@ -14,6 +14,6 @@ WORKDIR /urlshort
 
 COPY --from=builder /app/ /urlshort/
 
-ENV SHORTENED_URI mongodb+srv://urluser:urlpswd@cluster0.hl2el.mongodb.net/URLService?retryWrites=true&w=majority
+ENV SHORTENED_URI 
 
 CMD ["./shortener"]
